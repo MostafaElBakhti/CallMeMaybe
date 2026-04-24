@@ -14,7 +14,7 @@ def parse_arguments():
     )
 
     parse.add_argument(
-        "--function_definitions",
+        "--functions_definition",
         type=str,
         default="data/input/functions_definition.json"
     )
@@ -38,7 +38,7 @@ def main():
     print("starting...")
     args = parse_arguments()
 
-    ft_def = function_definition_check(args.function_definitions)
+    ft_def = function_definition_check(args.functions_definition)
     if not ft_def:
         raise RuntimeError(f"function definitions file is empty, please check {args.function_definitions}")
 

@@ -1,6 +1,7 @@
 from typing import Dict
 from pydantic import BaseModel
 from pydantic import ValidationError
+from typing import Any
 import json
 
 
@@ -22,49 +23,35 @@ class Function(BaseModel):
 class Prompt(BaseModel):
     prompt: str
 
-def function_definition_check(path):
+def _load_json(path: str, label: str) ->list[dict[str,Any]] :
     try:
         with open(path, "r", encoding="utf-8") as f:
             data = json.load(f)
-    except RuntimeError as e:
-        print(f"Error occurred while reading {path}: {e}")
-        raise RuntimeError("file not found , or permissions denied, or invalid JSON format ")
-    
-    if not isinstance(data, list):
-        raise RuntimeError("function definitions file must be a list")
-
-    validated = []
-
-    for item in data:
-        try:
-            func = Function.model_validate(item)
-            validated.append(func)
-        except ValidationError as e:
-            print(f"Validation error:\n{e}")
-            raise
-
-    return validated
-
-def prompt_check(path):
-    try:
-        with open(path, "r", encoding="utf-8") as f:
-            data = json.load(f)
-    except RuntimeError as e:
-        raise RuntimeError("file not found , or permissions denied, or invalid JSON format ")
+    except OSError as e:
+        raise RuntimeError(f"Error occurred while reading {path}: {e}")
     except json.JSONDecodeError as e:
-        raise RuntimeError(f"Invalid JSON format: {e}")
+        raise RuntimeError(f"Invalid JSON format in {path}: {e}")
 
     if not isinstance(data, list):
-        raise ValueError("prompt file must be a list")
+        raise RuntimeError(f"{label} file must be a JSON array")
 
-    validated = []
+    return data
+    
 
-    for item in data:
-        try:
-            prompt = Prompt.model_validate(item)
-            validated.append(prompt)
-        except ValidationError as e:
-            print(f"Validation error:\n{e}")
-            raise
 
-    return validated
+def function_definition_check(path: str) -> list[Function]:
+    data = _load_json(path, "Function definitions")
+    
+    try:
+        return [Function.model_validate(item) for item in data]
+    except ValidationError as e:
+        raise RuntimeError(f"Function definition validation error:\n{e}")
+
+
+def prompt_check(path: str) -> list[Prompt]:
+    data = _load_json(path, "Prompts")
+
+    try:
+        return [Prompt.model_validate(item) for item in data]
+    except ValidationError as e:
+        raise RuntimeError(f"Prompt validation error:\n{e}")

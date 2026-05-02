@@ -1,6 +1,8 @@
 import argparse
 from .models.validation import function_definition_check, prompt_check
 from .models.decoding import system_prompt_builder
+from llm_sdk import Small_LLM_Model
+
 
 
 def parse_arguments():
@@ -41,7 +43,7 @@ def main():
 
     functions = function_definition_check(args.functions_definition)
     if not functions:
-        raise RuntimeError(f"function definitions file is empty, please check {args.function_definitions}")
+        raise RuntimeError(f"function definitions file is empty, please check {args.functions_definition}")
 
     for f in functions:
         print(f)
@@ -56,7 +58,10 @@ def main():
 
     sys_prompt = system_prompt_builder(functions)
     print("\n===== SYSTEM PROMPT =====\n")
-    print(sys_prompt)
+    # print(sys_prompt)
+
+    print(f"loading model ... {args.model}")
+
 
 
 if __name__ == "__main__":

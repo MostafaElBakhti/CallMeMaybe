@@ -2,6 +2,7 @@ import argparse
 from .models.validation import function_definition_check, prompt_check
 from .models.decoding import system_prompt_builder
 from llm_sdk import Small_LLM_Model
+from .models.decoding import load_vocabulary
 
 
 
@@ -67,7 +68,8 @@ def main():
         raise RuntimeError(f"Failed to load model '{args.model}': {e}")
     print("Model loaded successfully.")
 
-    vocab = load_vocabulary(model)
+    id_to_token  = load_vocabulary(model)
+    print(f"Vocab size: {len(id_to_token)}")
 
 
 

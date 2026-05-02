@@ -5,7 +5,26 @@ from llm_sdk import Small_LLM_Model
 
 
 def load_vocabulary(model: Small_LLM_Model):
+    """Load the vocabulary from the tokenizer file.
+    
+    Args:
+        model: The loaded Small_LLM_Model instance.
+    
+    Returns:
+        A dictionary mapping token_id (int) -> token_string (str).
+    """
     vocab_path = model.get_path_to_tokenizer_file()
+    try : 
+        with open(vocab_path , "r", encoding="utf-8") as f:
+            tokenizer_data = json.load(f)
+        vocab = tokenizer_data.get("model", {}).get("vocab", {})
+    except OSError as e:
+        raise RuntimeError(f"Failed to read tokenizer file: {e}")
+    except json.JSONDecodeError as e:
+        raise RuntimeError(f"Invalid JSON in tokenizer file: {e}")
+    
+    id_to_token = {token_id: token_str for token_str, token_id in vocab.items()}
+    return id_to_token
 
 
 def system_prompt_builder(functions: list[Function]) -> str:

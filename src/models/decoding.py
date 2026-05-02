@@ -1,4 +1,11 @@
 from .validation import Function
+import json
+from llm_sdk import Small_LLM_Model
+
+
+
+def load_vocabulary(model: Small_LLM_Model):
+    vocab_path = model.get_path_to_tokenizer_file()
 
 
 def system_prompt_builder(functions: list[Function]) -> str:

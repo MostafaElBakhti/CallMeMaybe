@@ -61,6 +61,13 @@ def main():
     # print(sys_prompt)
 
     print(f"loading model ... {args.model}")
+    try:
+        model = Small_LLM_Model(model_name=args.model)
+    except Exception as e:
+        raise RuntimeError(f"Failed to load model '{args.model}': {e}")
+    print("Model loaded successfully.")
+
+    vocab = load_vocabulary(model)
 
 
 
